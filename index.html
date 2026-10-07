@@ -679,7 +679,7 @@
 
                 <div class="ink-row">
                     <span>INK</span>
-                    <span id="inkText">100%</span>
+                    <span id="inkText">100</span>
                 </div>
 
                 <div class="ink-track">
@@ -1238,7 +1238,7 @@
                 );
 
             $("inkText").textContent =
-                Math.round(percent) + "%";
+                Math.max(0, Math.round(state.ink));
 
             $("inkbar").style.width =
                 percent + "%";
