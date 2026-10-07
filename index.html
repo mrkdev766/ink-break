@@ -1200,8 +1200,8 @@
 
             state.inkMax =
                 Math.min(
-                    100 + (state.level - 1) * 28,
-                    600
+                    1000,
+                    Math.floor(100 * Math.pow(1.35, state.level - 1))
                 );
 
             state.ink = state.inkMax;
