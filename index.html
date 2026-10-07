@@ -1,0 +1,3125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+    <title>INK//BREAK</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: #08090d;
+            color: #fff;
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 520px;
+            height: 100%;
+            margin: auto;
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 50% -15%, #292d38 0%, transparent 43%),
+                #08090d;
+        }
+
+        .header {
+            height: 64px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 950;
+            letter-spacing: 2px;
+        }
+
+        .level {
+            font-size: 10px;
+            color: #858a99;
+            letter-spacing: 2px;
+        }
+
+        .screen {
+            position: absolute;
+            inset: 64px 0 0;
+            padding: 12px 18px 18px;
+            display: none;
+            flex-direction: column;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 9px;
+        }
+
+        .phase,
+        .theme {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #858a99;
+        }
+
+        .canvas-wrap {
+            width: 100%;
+            aspect-ratio: 1;
+            position: relative;
+            overflow: hidden;
+            border-radius: 23px;
+            background: #fff;
+            border: 1px solid #303440;
+            box-shadow: 0 20px 70px #0007;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            touch-action: none;
+        }
+
+        .music-panel {
+            margin-top: 9px;
+            padding: 9px 12px;
+            border-radius: 15px;
+            background: #11131a;
+            border: 1px solid #292d38;
+        }
+
+        .music-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            color: #707582;
+        }
+
+        .music-name {
+            color: #fff;
+            font-weight: 900;
+        }
+
+        .music-bars {
+            height: 20px;
+            margin-top: 6px;
+            display: flex;
+            align-items: end;
+            gap: 3px;
+            overflow: hidden;
+        }
+
+        .music-bars i {
+            width: 4px;
+            min-height: 3px;
+            border-radius: 5px;
+            background: #fff;
+            opacity: .72;
+            transition: height .15s;
+        }
+
+        .ink {
+            margin-top: 8px;
+        }
+
+        .ink-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: #707582;
+            margin-bottom: 5px;
+        }
+
+        .ink-track {
+            height: 5px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #292d38;
+        }
+
+        #inkbar {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            transition: width .12s;
+        }
+
+        .tools {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        button {
+            min-height: 44px;
+            border: 1px solid #2d313c;
+            border-radius: 14px;
+            background: #171a22;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 850;
+        }
+
+        button:active {
+            transform: scale(.97);
+        }
+
+        button.primary {
+            background: #fff;
+            color: #08090d;
+            border-color: #fff;
+        }
+
+        button:disabled {
+            opacity: .45;
+        }
+
+        .snap {
+            width: 100%;
+            height: 50px;
+            margin-top: 8px;
+        }
+
+        .memory {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .memory-label {
+            margin-bottom: 16px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #858a99;
+        }
+
+        .memory-art {
+            width: min(88vw, 420px);
+            aspect-ratio: 1;
+            overflow: hidden;
+            border-radius: 23px;
+            background: #fff;
+        }
+
+        .memory-art img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .now-playing {
+            margin-top: 15px;
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: #707582;
+        }
+
+        .wave {
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            margin-top: 7px;
+        }
+
+        .wave i {
+            width: 3px;
+            height: 5px;
+            border-radius: 4px;
+            background: #fff;
+            animation: wave .55s ease-in-out infinite alternate;
+        }
+
+        .wave i:nth-child(2n) {
+            animation-delay: .08s;
+        }
+
+        .wave i:nth-child(3n) {
+            animation-delay: .18s;
+        }
+
+        @keyframes wave {
+            from {
+                height: 4px;
+                opacity: .3
+            }
+
+            to {
+                height: 25px;
+                opacity: 1
+            }
+        }
+
+        .shatter {
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shatter-stage {
+            width: min(88vw, 420px);
+            aspect-ratio: 1;
+            position: relative;
+        }
+
+        .shatter-piece {
+            position: absolute;
+            overflow: hidden;
+            background: #fff;
+            border-radius: 3px;
+            transition:
+                transform .55s cubic-bezier(.2, .8, .2, 1),
+                opacity .4s;
+        }
+
+        .shatter-piece img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+        }
+
+        .puzzle-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 9px;
+        }
+
+        .puzzle-title {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: #858a99;
+        }
+
+        .remember {
+            min-height: 38px;
+            padding: 0 12px;
+            font-size: 10px;
+        }
+
+        #puzzle {
+            width: 100%;
+            aspect-ratio: 1;
+            display: grid;
+            gap: 3px;
+            padding: 3px;
+            background: #20232d;
+            border-radius: 20px;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .tile {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #0002;
+            border-radius: 4px;
+            background: #fff;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: transform .15s, filter .15s;
+        }
+
+        .tile img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: fill;
+            pointer-events: none;
+        }
+
+        .tile.selected {
+            transform: scale(.93);
+            outline: 3px solid #fff;
+            z-index: 5;
+        }
+
+        .tile.correct {
+            animation: correct .32s;
+        }
+
+        @keyframes correct {
+            50% {
+                transform: scale(.9);
+                filter: brightness(1.6);
+            }
+        }
+
+        .song-progress {
+            height: 5px;
+            margin-top: 8px;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #20232d;
+        }
+
+        #songProgress {
+            width: 0;
+            height: 100%;
+            background: #fff;
+            transition: width .3s;
+        }
+
+        .solve {
+            margin-top: 9px;
+            text-align: center;
+            font-size: 8px;
+            letter-spacing: 1.5px;
+            color: #666b77;
+        }
+
+        .success {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .success-art {
+            width: min(84vw, 400px);
+            aspect-ratio: 1;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 25px 90px #0008;
+        }
+
+        .success-art img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .success-title {
+            margin-top: 20px;
+            font-size: 32px;
+            font-weight: 1000;
+            letter-spacing: 5px;
+        }
+
+        .stats {
+            margin-top: 7px;
+            font-size: 9px;
+            color: #777c89;
+            letter-spacing: 1.5px;
+        }
+
+        .next {
+            width: min(400px, 100%);
+            margin-top: 20px;
+        }
+
+        .modal {
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 22px;
+            background: #000c;
+            backdrop-filter: blur(12px);
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 370px;
+            padding: 21px;
+            border: 1px solid #343844;
+            border-radius: 23px;
+            background: #11131a;
+            text-align: center;
+        }
+
+        .ad-label {
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: #707582;
+        }
+
+        .ad-box {
+            height: 155px;
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            background: #1a1d25;
+            color: #707582;
+            font-size: 10px;
+        }
+
+        .modal button {
+            width: 100%;
+            margin-top: 11px;
+        }
+
+        .tutorial {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 24px;
+            text-align: center;
+            background: #08090d;
+        }
+
+        .tutorial.show {
+            display: flex;
+        }
+
+        .tut-art {
+            width: min(74vw, 320px);
+            aspect-ratio: 1;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 23px;
+            border-radius: 22px;
+            background: #fff;
+        }
+
+        .tut-line {
+            position: absolute;
+            width: 65%;
+            height: 9px;
+            left: 18%;
+            top: 45%;
+            border-radius: 10px;
+            background: #111;
+            transform: rotate(-14deg);
+        }
+
+        .tut-title {
+            font-size: 27px;
+            font-weight: 1000;
+        }
+
+        .tut-text {
+            max-width: 320px;
+            margin-top: 9px;
+            color: #777c89;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .tut-btn {
+            width: min(320px, 100%);
+            margin-top: 21px;
+        }
+
+        .memory-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 90;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #08090d;
+        }
+
+        .memory-overlay img {
+            width: min(86vw, 420px);
+            aspect-ratio: 1;
+            object-fit: contain;
+            background: #fff;
+            border-radius: 23px;
+        }
+
+        .memory-overlay .small {
+            margin-top: 13px;
+            color: #777c89;
+            font-size: 9px;
+            letter-spacing: 2px;
+        }
+
+        @media(max-height:650px) {
+            .header {
+                height: 55px;
+            }
+
+            .screen {
+                inset: 55px 0 0;
+                padding-top: 7px;
+            }
+
+            .canvas-wrap, #puzzle {
+                max-height: 48vh;
+                max-width: 48vh;
+                margin: 0 auto;
+            }
+
+            .success-art, .memory-art, .shatter-stage {
+                width: min(88vw, 48vh);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <header class="header">
+            <div class="logo">INK//BREAK</div>
+            <div class="level" id="levelLabel">LEVEL 01</div>
+        </header>
+
+
+        <!-- DRAW -->
+        <section class="screen active" id="drawScreen">
+
+            <div class="top">
+                <div class="phase">01 / COMPOSE</div>
+                <div class="theme" id="themeLabel">MONO</div>
+            </div>
+
+            <div class="canvas-wrap">
+                <canvas id="canvas"></canvas>
+            </div>
+
+            <div class="music-panel">
+
+                <div class="music-row">
+                    <span>YOUR CANVAS</span>
+                    <span class="music-name" id="musicInfo">READY</span>
+                </div>
+
+                <div class="music-bars" id="musicBars"></div>
+
+            </div>
+
+            <div class="ink">
+
+                <div class="ink-row">
+                    <span>INK</span>
+                    <span id="inkText">100%</span>
+                </div>
+
+                <div class="ink-track">
+                    <div id="inkbar"></div>
+                </div>
+
+            </div>
+
+            <div class="tools">
+                <button id="pen" class="primary">✎ PEN</button>
+                <button id="eraser">⌫ ERASE</button>
+                <button id="clear">CLEAR</button>
+            </div>
+
+            <button id="snap" class="primary snap">
+                SNAP & BREAK
+            </button>
+
+        </section>
+
+
+        <!-- MEMORY -->
+        <section class="screen memory" id="memoryScreen">
+
+            <div class="memory-label">
+                REMEMBER YOUR SONG
+            </div>
+
+            <div class="memory-art">
+                <img id="memoryImage" alt="">
+            </div>
+
+            <div class="now-playing" id="playingText">
+                YOUR DRAWING IS PLAYING
+            </div>
+
+            <div class="wave" id="wave"></div>
+
+        </section>
+
+
+        <!-- SHATTER -->
+        <section class="screen shatter" id="shatterScreen">
+            <div class="shatter-stage" id="shatterStage"></div>
+        </section>
+
+
+        <!-- PUZZLE -->
+        <section class="screen" id="puzzleScreen">
+
+            <div class="puzzle-head">
+
+                <div class="puzzle-title">
+                    REBUILD THE SONG
+                </div>
+
+                <button class="remember" id="remember">
+                    👁 REMEMBER
+                </button>
+
+            </div>
+
+            <div id="puzzle"></div>
+
+            <div class="song-progress">
+                <div id="songProgress"></div>
+            </div>
+
+            <div class="solve">
+                EACH PIECE RESTORES PART OF YOUR MUSIC
+            </div>
+
+        </section>
+
+
+        <!-- SUCCESS -->
+        <section class="screen success" id="successScreen">
+
+            <div class="success-art">
+                <img id="successImage" alt="">
+            </div>
+
+            <div class="success-title">
+                REBUILT
+            </div>
+
+            <div class="stats" id="stats"></div>
+
+            <button class="primary next" id="next">
+                NEXT LEVEL →
+            </button>
+
+        </section>
+
+
+        <!-- REMEMBER -->
+        <div class="modal" id="rememberModal">
+
+            <div class="modal-card">
+
+                <div class="ad-label">
+                    REWARDED MEMORY
+                </div>
+
+                <div class="ad-box">
+                    ADVERTISEMENT
+                </div>
+
+                <button class="primary" id="watchRemember">
+                    WATCH & REMEMBER
+                </button>
+
+                <button id="cancelRemember">
+                    CANCEL
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- TUTORIAL -->
+        <div class="tutorial" id="tutorial">
+
+            <div class="tut-art">
+                <div class="tut-line"></div>
+            </div>
+
+            <div class="tut-title">
+                DRAW A SONG
+            </div>
+
+            <div class="tut-text">
+                Draw anything.<br>
+                Your drawing becomes music.<br>
+                Then it breaks apart.<br>
+                Rebuild it to restore the song.
+            </div>
+
+            <button class="primary tut-btn" id="startGame">
+                NOW YOU →
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+        "use strict";
+
+        /* =========================================================
+           DOM
+        ========================================================= */
+
+        const $ = id => document.getElementById(id);
+
+        const canvas = $("canvas");
+        const ctx = canvas.getContext("2d", {
+            alpha: false,
+            willReadFrequently: true
+        });
+
+
+        /* =========================================================
+           GAME STATE
+        ========================================================= */
+
+        const state = {
+
+            level: 1,
+
+            drawing: false,
+            erasing: false,
+
+            pointerId: null,
+            lastX: 0,
+            lastY: 0,
+
+            ink: 100,
+            inkMax: 100,
+
+            strokes: [],
+            currentStroke: null,
+
+            artworkCanvas: null,
+            artworkURL: "",
+
+            grid: 2,
+            tiles: [],
+
+            selectedTile: null,
+
+            song: [],
+            songTimerIds: [],
+
+            audio: null,
+            audioUnlocked: false,
+
+            solved: false,
+
+            memoryTimer: null
+        };
+
+
+        /* =========================================================
+           THEMES
+        ========================================================= */
+
+        const THEMES = [
+            {
+                name: "MONO",
+                bg: "#ffffff",
+                ink: "#111111",
+                wave: "sine"
+            },
+            {
+                name: "AQUA",
+                bg: "#efffff",
+                ink: "#073f45",
+                wave: "triangle"
+            },
+            {
+                name: "NEON",
+                bg: "#faf4ff",
+                ink: "#481476",
+                wave: "square"
+            },
+            {
+                name: "GARDEN",
+                bg: "#f4fff3",
+                ink: "#163d1a",
+                wave: "sine"
+            },
+            {
+                name: "EMBER",
+                bg: "#fff7ef",
+                ink: "#57220b",
+                wave: "sawtooth"
+            },
+            {
+                name: "DREAM",
+                bg: "#f5f5ff",
+                ink: "#20205e",
+                wave: "triangle"
+            }
+        ];
+
+        function getTheme() {
+            return THEMES[
+                (state.level - 1) % THEMES.length
+            ];
+        }
+
+
+        /* =========================================================
+           SCREEN CONTROL
+        ========================================================= */
+
+        function showScreen(id) {
+
+            document
+                .querySelectorAll(".screen")
+                .forEach(screen => {
+                    screen.classList.remove("active");
+                });
+
+            $(id).classList.add("active");
+        }
+
+
+        /* =========================================================
+           AUDIO
+        ========================================================= */
+
+        function getAudio() {
+
+            if (!state.audio) {
+
+                const AudioContext =
+                    window.AudioContext ||
+                    window.webkitAudioContext;
+
+                if (!AudioContext)
+                    return null;
+
+                state.audio =
+                    new AudioContext();
+            }
+
+            if (state.audio.state === "suspended") {
+                state.audio.resume().catch(() => { });
+            }
+
+            state.audioUnlocked = true;
+
+            return state.audio;
+        }
+
+        function stopScheduledSong() {
+
+            state.songTimerIds.forEach(id => {
+                clearTimeout(id);
+            });
+
+            state.songTimerIds = [];
+        }
+
+        function playNote(
+            frequency,
+            duration = .15,
+            volume = .035,
+            type = null
+        ) {
+
+            const ac = getAudio();
+
+            if (!ac) return;
+
+            const oscillator =
+                ac.createOscillator();
+
+            const gain =
+                ac.createGain();
+
+            oscillator.type =
+                type || getTheme().wave;
+
+            oscillator.frequency.value =
+                Math.max(40, Math.min(1800, frequency));
+
+            const now = ac.currentTime;
+
+            gain.gain.setValueAtTime(
+                0.0001,
+                now
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                Math.max(.001, volume),
+                now + .012
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                .0001,
+                now + Math.max(.04, duration)
+            );
+
+            oscillator.connect(gain);
+            gain.connect(ac.destination);
+
+            oscillator.start(now);
+
+            oscillator.stop(
+                now + Math.max(.05, duration) + .03
+            );
+        }
+
+
+        /* =========================================================
+           SCALE
+        ========================================================= */
+
+        /*
+          Pentatonic-ish scale.
+          Keeping notes inside a scale prevents ugly
+          random combinations.
+        */
+
+        const SCALE = [
+            261.63,
+            293.66,
+            329.63,
+            392.00,
+            440.00,
+            523.25,
+            587.33,
+            659.25,
+            783.99,
+            880.00,
+            1046.50,
+            1174.66
+        ];
+
+        function positionToFrequency(x, y) {
+
+            x = Math.max(0, Math.min(1, x));
+            y = Math.max(0, Math.min(1, y));
+
+            const index = Math.min(
+                SCALE.length - 1,
+                Math.floor(x * SCALE.length)
+            );
+
+            /*
+              Top of canvas gets brighter/higher.
+            */
+            let octave = 0;
+
+            if (y < .30) octave = 1;
+            else if (y > .75) octave = -1;
+
+            return SCALE[index] *
+                Math.pow(2, octave);
+        }
+
+
+        /* =========================================================
+           CANVAS
+        ========================================================= */
+
+        function resizeCanvas() {
+
+            const rect =
+                canvas.getBoundingClientRect();
+
+            const dpr =
+                Math.min(
+                    window.devicePixelRatio || 1,
+                    2
+                );
+
+            const width =
+                Math.max(1, Math.round(rect.width * dpr));
+
+            const height =
+                Math.max(1, Math.round(rect.height * dpr));
+
+            /*
+              Preserve current artwork when resizing.
+            */
+            let old = null;
+
+            if (canvas.width > 0 && canvas.height > 0) {
+
+                old = document.createElement("canvas");
+
+                old.width = canvas.width;
+                old.height = canvas.height;
+
+                old.getContext("2d")
+                    .drawImage(canvas, 0, 0);
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            ctx.fillStyle = getTheme().bg;
+            ctx.fillRect(
+                0,
+                0,
+                width,
+                height
+            );
+
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+
+            if (old) {
+
+                ctx.drawImage(
+                    old,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+            }
+        }
+
+        function clearCanvas() {
+
+            ctx.fillStyle = getTheme().bg;
+
+            ctx.fillRect(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+        }
+
+
+        /* =========================================================
+           NEW LEVEL / RESET
+        ========================================================= */
+
+        function resetLevel() {
+
+            stopScheduledSong();
+
+            state.drawing = false;
+            state.erasing = false;
+            $("pen").classList.add("primary");
+            $("eraser").classList.remove("primary");
+
+            state.pointerId = null;
+            state.currentStroke = null;
+
+            state.strokes = [];
+            state.song = [];
+            state.tiles = [];
+            state.selectedTile = null;
+            state.artworkCanvas = null;
+            state.artworkURL = "";
+            state.solved = false;
+
+            state.inkMax =
+                Math.min(
+                    100 + (state.level - 1) * 28,
+                    600
+                );
+
+            state.ink = state.inkMax;
+
+            resizeCanvas();
+            clearCanvas();
+
+            $("levelLabel").textContent =
+                "LEVEL " +
+                String(state.level).padStart(2, "0");
+
+            $("themeLabel").textContent =
+                getTheme().name;
+
+            updateInkUI();
+            updateMusicUI();
+        }
+
+        function updateInkUI() {
+
+            const percent =
+                Math.max(
+                    0,
+                    Math.min(
+                        100,
+                        state.ink / state.inkMax * 100
+                    )
+                );
+
+            $("inkText").textContent =
+                Math.round(percent) + "%";
+
+            $("inkbar").style.width =
+                percent + "%";
+        }
+
+
+        /* =========================================================
+           POINTER POSITION
+        ========================================================= */
+
+        function pointerPosition(event) {
+
+            const rect =
+                canvas.getBoundingClientRect();
+
+            return {
+                x: Math.max(
+                    0,
+                    Math.min(
+                        1,
+                        (event.clientX - rect.left) / rect.width
+                    )
+                ),
+
+                y: Math.max(
+                    0,
+                    Math.min(
+                        1,
+                        (event.clientY - rect.top) / rect.height
+                    )
+                )
+            };
+        }
+
+
+        /* =========================================================
+           DRAWING
+        ========================================================= */
+
+        function beginDraw(event) {
+
+            event.preventDefault();
+
+            getAudio();
+
+            state.drawing = true;
+            state.pointerId = event.pointerId;
+
+            try {
+                canvas.setPointerCapture(
+                    event.pointerId
+                );
+            } catch (_) { }
+
+            const p =
+                pointerPosition(event);
+
+            p.time = performance.now();
+
+            state.lastX = p.x;
+            state.lastY = p.y;
+
+            state.currentStroke = {
+                erase: state.erasing,
+                width: state.erasing ? .065 : .012,
+                start: performance.now(),
+                points: [p]
+            };
+        }
+
+        function drawMove(event) {
+
+            if (!state.drawing)
+                return;
+
+            if (
+                state.pointerId !== null &&
+                event.pointerId !== state.pointerId
+            )
+                return;
+
+            event.preventDefault();
+
+            const p =
+                pointerPosition(event);
+
+            p.time = performance.now();
+
+            const dx =
+                p.x - state.lastX;
+
+            const dy =
+                p.y - state.lastY;
+
+            const distance =
+                Math.sqrt(dx * dx + dy * dy);
+
+            /*
+              Ignore microscopic pointer noise.
+            */
+            if (distance < .0015)
+                return;
+
+            /*
+              Ink cost.
+            */
+            const cost =
+                distance *
+                (state.erasing ? 55 : 70);
+
+            state.ink =
+                Math.max(
+                    0,
+                    state.ink - cost
+                );
+
+            const theme = getTheme();
+
+            ctx.strokeStyle =
+                state.erasing
+                    ? theme.bg
+                    : theme.ink;
+
+            ctx.lineWidth =
+                state.erasing
+                    ? canvas.width * .065
+                    : canvas.width * .012;
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                state.lastX * canvas.width,
+                state.lastY * canvas.height
+            );
+
+            ctx.lineTo(
+                p.x * canvas.width,
+                p.y * canvas.height
+            );
+
+            ctx.stroke();
+
+            state.currentStroke.points.push(p);
+
+            /*
+              Live sound.
+            */
+            if (!state.erasing) {
+                playDrawPreview(
+                    state.currentStroke
+                );
+            }
+
+            state.lastX = p.x;
+            state.lastY = p.y;
+
+            updateInkUI();
+            updateMusicUI();
+
+            if (state.ink <= 0) {
+                endDraw(event);
+            }
+        }
+
+        function endDraw(event) {
+
+            if (!state.drawing)
+                return;
+
+            state.drawing = false;
+
+            try {
+                if (
+                    event &&
+                    canvas.hasPointerCapture &&
+                    canvas.hasPointerCapture(event.pointerId)
+                ) {
+                    canvas.releasePointerCapture(
+                        event.pointerId
+                    );
+                }
+            } catch (_) { }
+
+            const stroke =
+                state.currentStroke;
+
+            if (stroke) {
+
+                if (stroke.points.length >= 2) {
+
+                    let length = 0;
+
+                    for (
+                        let i = 1;
+                        i < stroke.points.length;
+                        i++
+                    ) {
+
+                        const a =
+                            stroke.points[i - 1];
+
+                        const b =
+                            stroke.points[i];
+
+                        length += Math.hypot(
+                            b.x - a.x,
+                            b.y - a.y
+                        );
+                    }
+
+                    stroke.length = length;
+
+                    stroke.duration =
+                        performance.now() -
+                        stroke.start;
+
+                    state.strokes.push(stroke);
+                }
+            }
+
+            state.currentStroke = null;
+
+            updateMusicUI();
+        }
+
+        canvas.addEventListener(
+            "pointerdown",
+            beginDraw
+        );
+
+        canvas.addEventListener(
+            "pointermove",
+            drawMove
+        );
+
+        canvas.addEventListener(
+            "pointerup",
+            endDraw
+        );
+
+        canvas.addEventListener(
+            "pointercancel",
+            endDraw
+        );
+
+        canvas.addEventListener(
+            "lostpointercapture",
+            () => {
+                if (state.drawing)
+                    endDraw();
+            }
+        );
+
+
+        /* =========================================================
+           LIVE DRAW SOUND
+        ========================================================= */
+
+        function playDrawPreview(stroke) {
+
+            const points =
+                stroke.points;
+
+            if (points.length < 2)
+                return;
+
+            /*
+              Don't create audio for every pixel.
+              Sample only meaningful movement.
+            */
+            if (points.length % 3 !== 0)
+                return;
+
+            const a =
+                points[points.length - 2];
+
+            const b =
+                points[points.length - 1];
+
+            const distance =
+                Math.hypot(
+                    b.x - a.x,
+                    b.y - a.y
+                );
+
+            if (distance < .008)
+                return;
+
+            const frequency =
+                positionToFrequency(
+                    b.x,
+                    b.y
+                );
+
+            const duration =
+                Math.max(
+                    .06,
+                    Math.min(
+                        .28,
+                        distance * 4
+                    )
+                );
+
+            const volume =
+                Math.min(
+                    .045,
+                    .018 + distance * .08
+                );
+
+            playNote(
+                frequency,
+                duration,
+                volume
+            );
+        }
+
+
+        /* =========================================================
+           MUSIC UI
+        ========================================================= */
+
+        function updateMusicUI() {
+
+            const bars = $("musicBars");
+
+            bars.innerHTML = "";
+
+            const count =
+                Math.min(
+                    22,
+                    Math.max(
+                        3,
+                        state.strokes.length * 2
+                    )
+                );
+
+            for (let i = 0; i < count; i++) {
+
+                const bar =
+                    document.createElement("i");
+
+                const stroke =
+                    state.strokes.length
+                        ? state.strokes[
+                        i % state.strokes.length
+                        ]
+                        : null;
+
+                let height = 5;
+
+                if (stroke) {
+
+                    height =
+                        Math.max(
+                            4,
+                            Math.min(
+                                19,
+                                stroke.length * 90
+                            )
+                        );
+                }
+
+                bar.style.height =
+                    height + "px";
+
+                bars.appendChild(bar);
+            }
+
+            $("musicInfo").textContent =
+                state.strokes.length
+                    ? state.strokes.length + " LAYERS"
+                    : "READY";
+        }
+
+
+        /* =========================================================
+           TOOLS
+        ========================================================= */
+
+        $("pen").onclick = () => {
+
+            state.erasing = false;
+
+            $("pen").classList.add("primary");
+            $("eraser").classList.remove("primary");
+        };
+
+        $("eraser").onclick = () => {
+
+            state.erasing = true;
+
+            $("eraser").classList.add("primary");
+            $("pen").classList.remove("primary");
+        };
+
+        $("clear").onclick = () => {
+
+            state.strokes = [];
+            state.currentStroke = null;
+            state.ink = state.inkMax;
+
+            clearCanvas();
+
+            updateInkUI();
+            updateMusicUI();
+        };
+
+
+        /* =========================================================
+           BUILD MUSICAL SCORE
+        ========================================================= */
+
+        /*
+          Important:
+        
+          Erasing is represented as an eraser stroke.
+          Notes whose source point falls inside an erased
+          region are removed from the final composition.
+        */
+
+        function pointErased(x, y) {
+
+            for (const eraser of state.strokes) {
+
+                if (!eraser.erase)
+                    continue;
+
+                const radius = .065;
+
+                for (const p of eraser.points) {
+
+                    if (
+                        Math.hypot(
+                            x - p.x,
+                            y - p.y
+                        ) < radius
+                    ) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        function buildSong() {
+
+            const events = [];
+
+            const drawingStrokes =
+                state.strokes.filter(
+                    s => !s.erase
+                );
+
+            drawingStrokes.forEach(
+                (stroke, strokeIndex) => {
+
+                    const points =
+                        stroke.points;
+
+                    if (points.length < 2)
+                        return;
+
+                    /*
+                      Up to 12 musical events per stroke.
+                      So a large drawing can still create
+                      dozens or hundreds of notes.
+                    */
+                    const samples =
+                        Math.min(
+                            12,
+                            Math.max(
+                                2,
+                                Math.ceil(points.length / 8)
+                            )
+                        );
+
+                    const step =
+                        (points.length - 1) /
+                        Math.max(1, samples - 1);
+
+                    for (let n = 0; n < samples; n++) {
+
+                        const index =
+                            Math.min(
+                                points.length - 1,
+                                Math.round(n * step)
+                            );
+
+                        const point =
+                            points[index];
+
+                        /*
+                          Eraser affects music too.
+                        */
+                        if (
+                            pointErased(
+                                point.x,
+                                point.y
+                            )
+                        ) {
+                            continue;
+                        }
+
+                        const prev =
+                            points[
+                            Math.max(0, index - 1)
+                            ];
+
+                        const next =
+                            points[
+                            Math.min(
+                                points.length - 1,
+                                index + 1
+                            )
+                            ];
+
+                        const dx =
+                            next.x - prev.x;
+
+                        const dy =
+                            next.y - prev.y;
+
+                        const speed =
+                            Math.hypot(dx, dy);
+
+                        /*
+                          Direction slightly changes
+                          the musical interval.
+                        */
+                        const direction =
+                            Math.atan2(dy, dx);
+
+                        let frequency =
+                            positionToFrequency(
+                                point.x,
+                                point.y
+                            );
+
+                        if (direction > .8)
+                            frequency *= 1.05946;
+
+                        if (direction < -.8)
+                            frequency *= .94387;
+
+                        const duration =
+                            Math.max(
+                                .08,
+                                Math.min(
+                                    .45,
+                                    .09 +
+                                    stroke.length * .35
+                                )
+                            );
+
+                        const velocity =
+                            Math.max(
+                                .018,
+                                Math.min(
+                                    .055,
+                                    .022 +
+                                    speed * .25 +
+                                    stroke.length * .03
+                                )
+                            );
+
+                        /*
+                          Assign the note to its puzzle tile.
+                          This is what lets solving rebuild
+                          the music.
+                        */
+                        const tile =
+                            Math.min(
+                                state.grid * state.grid - 1,
+                                Math.floor(
+                                    point.y * state.grid
+                                ) * state.grid +
+                                Math.floor(
+                                    point.x * state.grid
+                                )
+                            );
+
+                        events.push({
+                            frequency,
+                            duration,
+                            velocity,
+                            x: point.x,
+                            y: point.y,
+                            tile,
+                            stroke: strokeIndex,
+                            direction,
+                            time: point.time
+                        });
+                    }
+                }
+            );
+
+            /*
+              Never let a drawing create an unreasonable
+              number of simultaneous events.
+            */
+            return events.slice(0, 240);
+        }
+
+
+        /* =========================================================
+           SONG PLAYBACK
+        ========================================================= */
+
+        function playSong(song) {
+
+            stopScheduledSong();
+
+            if (!song || !song.length) {
+
+                playNote(
+                    261.63,
+                    .3,
+                    .035
+                );
+
+                return Promise.resolve(450);
+            }
+
+            /*
+              Spread notes across a musical timeline.
+            */
+            let currentTime = 0;
+            let lastOriginalTime = song[0].time || 0;
+
+            song.forEach(
+                (event, index) => {
+
+                    if (event.time !== undefined) {
+                        const diff = event.time - lastOriginalTime;
+                        // Cap pauses between notes at 500ms so there isn't dead silence
+                        currentTime += Math.min(Math.max(0, diff), 500);
+                        lastOriginalTime = event.time;
+                    } else {
+                        currentTime += 60;
+                    }
+
+                    const id = setTimeout(
+                        () => {
+                            playNote(
+                                event.frequency,
+                                event.duration,
+                                event.velocity
+                            );
+                        },
+                        currentTime
+                    );
+
+                    state.songTimerIds.push(id);
+                }
+            );
+
+            return new Promise(
+                resolve => {
+
+                    const total =
+                        currentTime +
+                        500;
+
+                    const id = setTimeout(
+                        () => resolve(total),
+                        total
+                    );
+
+                    state.songTimerIds.push(id);
+                }
+            );
+        }
+
+
+        /* =========================================================
+           SNAP
+        ========================================================= */
+
+        $("snap").onclick =
+            async () => {
+
+                /*
+                  Unlock audio from a user gesture.
+                */
+                getAudio();
+
+                endDraw();
+
+                const hasDrawing =
+                    state.strokes.some(
+                        s => !s.erase
+                    );
+
+                if (!hasDrawing) {
+
+                    playNote(
+                        220,
+                        .15,
+                        .035
+                    );
+
+                    return;
+                }
+
+                /*
+                  Capture exact artwork.
+                */
+                state.artworkURL =
+                    canvas.toDataURL(
+                        "image/png"
+                    );
+
+                $("memoryImage").src =
+                    state.artworkURL;
+
+                showScreen("memoryScreen");
+
+                /*
+                  Short visual pause.
+                */
+                await sleep(700);
+
+                $("playingText").textContent =
+                    "YOUR DRAWING IS PLAYING";
+
+                /*
+                  Build music before shattering.
+                */
+                state.song =
+                    buildSong();
+
+                await playSong(state.song);
+
+                await sleep(350);
+
+                await createShatter();
+            };
+
+
+        /* =========================================================
+           ARTWORK PROCESSING
+        ========================================================= */
+
+        function getRGB(hex) {
+
+            const value =
+                hex.replace("#", "");
+
+            return {
+                r: parseInt(value.substring(0, 2), 16),
+                g: parseInt(value.substring(2, 4), 16),
+                b: parseInt(value.substring(4, 6), 16)
+            };
+        }
+
+        function createTightSquare() {
+
+            const source =
+                document.createElement("canvas");
+
+            source.width = canvas.width;
+            source.height = canvas.height;
+
+            const sctx =
+                source.getContext(
+                    "2d",
+                    { willReadFrequently: true }
+                );
+
+            sctx.drawImage(
+                canvas,
+                0,
+                0
+            );
+
+            const image =
+                sctx.getImageData(
+                    0,
+                    0,
+                    source.width,
+                    source.height
+                );
+
+            const bg =
+                getRGB(getTheme().bg);
+
+            let minX = source.width;
+            let minY = source.height;
+            let maxX = -1;
+            let maxY = -1;
+
+            /*
+              Find actual drawing pixels.
+            */
+            for (
+                let y = 0;
+                y < source.height;
+                y++
+            ) {
+
+                for (
+                    let x = 0;
+                    x < source.width;
+                    x++
+                ) {
+
+                    const i =
+                        (y * source.width + x) * 4;
+
+                    const difference =
+                        Math.abs(image.data[i] - bg.r) +
+                        Math.abs(image.data[i + 1] - bg.g) +
+                        Math.abs(image.data[i + 2] - bg.b);
+
+                    if (difference > 30) {
+
+                        minX = Math.min(minX, x);
+                        minY = Math.min(minY, y);
+                        maxX = Math.max(maxX, x);
+                        maxY = Math.max(maxY, y);
+                    }
+                }
+            }
+
+            /*
+              Completely blank canvas.
+            */
+            if (maxX < 0) {
+
+                const blank =
+                    document.createElement("canvas");
+
+                blank.width = source.width;
+                blank.height = source.height;
+
+                const bctx =
+                    blank.getContext("2d");
+
+                bctx.fillStyle =
+                    getTheme().bg;
+
+                bctx.fillRect(
+                    0,
+                    0,
+                    blank.width,
+                    blank.height
+                );
+
+                return blank;
+            }
+
+            const drawingWidth =
+                maxX - minX + 1;
+
+            const drawingHeight =
+                maxY - minY + 1;
+
+            const drawingSize =
+                Math.max(
+                    drawingWidth,
+                    drawingHeight
+                );
+
+            /*
+              Small margin around artwork.
+            */
+            const margin =
+                Math.max(
+                    12,
+                    drawingSize * .08
+                );
+
+            const finalSize =
+                Math.ceil(
+                    drawingSize + margin * 2
+                );
+
+            const output =
+                document.createElement("canvas");
+
+            output.width = finalSize;
+            output.height = finalSize;
+
+            const octx =
+                output.getContext("2d");
+
+            octx.fillStyle =
+                getTheme().bg;
+
+            octx.fillRect(
+                0,
+                0,
+                finalSize,
+                finalSize
+            );
+
+            /*
+              Center the original drawing
+              inside a square.
+            */
+            const cropX =
+                minX -
+                (drawingSize - drawingWidth) / 2;
+
+            const cropY =
+                minY -
+                (drawingSize - drawingHeight) / 2;
+
+            octx.drawImage(
+                source,
+                cropX,
+                cropY,
+                drawingSize,
+                drawingSize,
+                margin,
+                margin,
+                drawingSize,
+                drawingSize
+            );
+
+            return output;
+        }
+
+
+        /* =========================================================
+           TILE OCCUPANCY
+        ========================================================= */
+
+        function tileOccupancy(
+            source,
+            grid,
+            row,
+            col
+        ) {
+
+            const c =
+                source.getContext(
+                    "2d",
+                    { willReadFrequently: true }
+                );
+
+            const size =
+                source.width;
+
+            const tileSize =
+                Math.floor(size / grid);
+
+            const image =
+                c.getImageData(
+                    col * tileSize,
+                    row * tileSize,
+                    tileSize,
+                    tileSize
+                );
+
+            const bg =
+                getRGB(getTheme().bg);
+
+            let meaningful = 0;
+
+            for (
+                let i = 0;
+                i < image.data.length;
+                i += 4
+            ) {
+
+                const difference =
+                    Math.abs(image.data[i] - bg.r) +
+                    Math.abs(image.data[i + 1] - bg.g) +
+                    Math.abs(image.data[i + 2] - bg.b);
+
+                if (difference > 30)
+                    meaningful++;
+            }
+
+            return meaningful /
+                (tileSize * tileSize);
+        }
+
+
+        /* =========================================================
+           SMART GRID
+        ========================================================= */
+
+        function chooseSmartGrid(source) {
+
+            /*
+              Higher levels can become harder.
+            */
+            const maximum =
+                Math.min(
+                    2 +
+                    Math.floor(
+                        (state.level - 1) / 2
+                    ),
+                    5
+                );
+
+            const candidates = [];
+
+            for (
+                let grid = maximum;
+                grid >= 2;
+                grid--
+            ) {
+
+                let empty = 0;
+                let weak = 0;
+
+                for (
+                    let row = 0;
+                    row < grid;
+                    row++
+                ) {
+
+                    for (
+                        let col = 0;
+                        col < grid;
+                        col++
+                    ) {
+
+                        const value =
+                            tileOccupancy(
+                                source,
+                                grid,
+                                row,
+                                col
+                            );
+
+                        if (value < .008)
+                            empty++;
+
+                        if (value < .035)
+                            weak++;
+                    }
+                }
+
+                candidates.push({
+                    grid,
+                    empty,
+                    weak
+                });
+            }
+
+            /*
+              First choice:
+              no completely blank pieces and
+              at most one weak piece.
+            */
+            const good =
+                candidates.find(
+                    x => x.empty === 0 &&
+                        x.weak <= 1
+                );
+
+            if (good)
+                return good.grid;
+
+            /*
+              Otherwise minimize blank tiles first.
+            */
+            candidates.sort(
+                (a, b) =>
+                    a.empty - b.empty ||
+                    a.weak - b.weak ||
+                    b.grid - a.grid
+            );
+
+            return candidates[0].grid;
+        }
+
+
+        /* =========================================================
+           TILE IMAGE CREATION
+        ========================================================= */
+
+        function makeTileCanvases(source, grid) {
+
+            const tiles = [];
+
+            const size =
+                Math.floor(
+                    source.width / grid
+                );
+
+            for (
+                let row = 0;
+                row < grid;
+                row++
+            ) {
+
+                for (
+                    let col = 0;
+                    col < grid;
+                    col++
+                ) {
+
+                    const tile =
+                        document.createElement("canvas");
+
+                    tile.width = size;
+                    tile.height = size;
+
+                    const tctx =
+                        tile.getContext("2d");
+
+                    tctx.drawImage(
+                        source,
+
+                        col * size,
+                        row * size,
+                        size,
+                        size,
+
+                        0,
+                        0,
+                        size,
+                        size
+                    );
+
+                    tiles.push(tile);
+                }
+            }
+
+            return tiles;
+        }
+
+
+        /* =========================================================
+           SHATTER
+        ========================================================= */
+
+        async function createShatter() {
+
+            state.artworkCanvas =
+                createTightSquare();
+
+            state.grid =
+                chooseSmartGrid(
+                    state.artworkCanvas
+                );
+
+            /*
+              Rebuild song after the grid is known
+              so each note gets its correct tile.
+            */
+            state.song =
+                buildSong();
+
+            const tileCanvases =
+                makeTileCanvases(
+                    state.artworkCanvas,
+                    state.grid
+                );
+
+            showScreen("shatterScreen");
+
+            const stage =
+                $("shatterStage");
+
+            stage.innerHTML = "";
+
+            const stageSize =
+                stage.clientWidth;
+
+            const tileSize =
+                stageSize / state.grid;
+
+            const pieces = [];
+
+            tileCanvases.forEach(
+                (tileCanvas, index) => {
+
+                    const piece =
+                        document.createElement("div");
+
+                    piece.className =
+                        "shatter-piece";
+
+                    piece.style.width =
+                        tileSize + "px";
+
+                    piece.style.height =
+                        tileSize + "px";
+
+                    const row =
+                        Math.floor(index / state.grid);
+
+                    const col =
+                        index % state.grid;
+
+                    piece.style.left =
+                        col * tileSize + "px";
+
+                    piece.style.top =
+                        row * tileSize + "px";
+
+                    const image =
+                        document.createElement("img");
+
+                    image.src =
+                        tileCanvas.toDataURL(
+                            "image/png"
+                        );
+
+                    image.style.width =
+                        tileSize + "px";
+
+                    image.style.height =
+                        tileSize + "px";
+
+                    piece.appendChild(image);
+
+                    stage.appendChild(piece);
+
+                    pieces.push({
+                        element: piece,
+                        row,
+                        col
+                    });
+                }
+            );
+
+            await sleep(250);
+
+            /*
+              Crack apart.
+            */
+            pieces.forEach(
+                ({ element, row, col }) => {
+
+                    const dx =
+                        (col / (state.grid - 1 || 1) - .5) *
+                        120;
+
+                    const dy =
+                        (row / (state.grid - 1 || 1) - .5) *
+                        120;
+
+                    const rotation =
+                        (Math.random() - .5) * 40;
+
+                    element.style.transform =
+                        `translate(${dx}px,${dy}px)
+         rotate(${rotation}deg)`;
+                }
+            );
+
+            await sleep(600);
+
+            /*
+              Scatter.
+            */
+            pieces.forEach(
+                ({ element }) => {
+
+                    const x =
+                        (Math.random() - .5) *
+                        stageSize * 1.2;
+
+                    const y =
+                        (Math.random() - .5) *
+                        stageSize * 1.2;
+
+                    const r =
+                        (Math.random() - .5) *
+                        500;
+
+                    element.style.transform =
+                        `translate(${x}px,${y}px)
+         rotate(${r}deg)`;
+
+                    element.style.opacity = "0";
+                }
+            );
+
+            await sleep(650);
+
+            createPuzzle(tileCanvases);
+        }
+
+
+        /* =========================================================
+           PUZZLE
+        ========================================================= */
+
+        function createPuzzle(tileCanvases) {
+
+            showScreen("puzzleScreen");
+
+            const puzzle =
+                $("puzzle");
+
+            puzzle.innerHTML = "";
+
+            puzzle.style.gridTemplateColumns =
+                `repeat(${state.grid},1fr)`;
+
+            puzzle.style.gridTemplateRows =
+                `repeat(${state.grid},1fr)`;
+
+            state.tiles = [];
+            state.selectedTile = null;
+
+            const total =
+                state.grid * state.grid;
+
+            /*
+              Fisher-Yates shuffle.
+            */
+            const order =
+                Array.from(
+                    { length: total },
+                    (_, i) => i
+                );
+
+            let attempts = 0;
+
+            do {
+
+                for (
+                    let i = order.length - 1;
+                    i > 0;
+                    i--
+                ) {
+
+                    const j =
+                        Math.floor(
+                            Math.random() * (i + 1)
+                        );
+
+                    [
+                        order[i],
+                        order[j]
+                    ] = [
+                            order[j],
+                            order[i]
+                        ];
+                }
+
+                attempts++;
+
+            } while (
+                order.every(
+                    (value, index) =>
+                        value === index
+                ) &&
+                attempts < 20
+            );
+
+            /*
+              A tile object stores:
+                position = current board position
+                correct = original position
+            */
+            order.forEach(
+                (correctIndex, currentIndex) => {
+
+                    const element =
+                        document.createElement("div");
+
+                    element.className = "tile";
+
+                    const image =
+                        document.createElement("img");
+
+                    image.src =
+                        tileCanvases[
+                            correctIndex
+                        ].toDataURL(
+                            "image/png"
+                        );
+
+                    element.appendChild(image);
+
+                    const tile = {
+                        element,
+                        current: currentIndex,
+                        correct: correctIndex,
+                        image
+                    };
+
+                    state.tiles.push(tile);
+
+                    puzzle.appendChild(element);
+
+                    /*
+                      Pointer interaction supports:
+                      tap A -> tap B
+                      and drag A -> B.
+                    */
+                    attachTileInteraction(tile);
+                }
+            );
+
+            updateSongProgress();
+        }
+
+
+        /* =========================================================
+           TILE INTERACTION
+        ========================================================= */
+
+        function attachTileInteraction(tile) {
+
+            let startX = 0;
+            let startY = 0;
+            let dragging = false;
+
+            tile.element.addEventListener(
+                "pointerdown",
+                event => {
+
+                    event.preventDefault();
+
+                    startX = event.clientX;
+                    startY = event.clientY;
+
+                    dragging = false;
+
+                    try {
+                        tile.element.setPointerCapture(
+                            event.pointerId
+                        );
+                    } catch (_) { }
+                }
+            );
+
+            tile.element.addEventListener(
+                "pointermove",
+                event => {
+
+                    if (
+                        Math.hypot(
+                            event.clientX - startX,
+                            event.clientY - startY
+                        ) > 12
+                    ) {
+                        dragging = true;
+                    }
+                }
+            );
+
+            tile.element.addEventListener(
+                "pointerup",
+                event => {
+
+                    event.preventDefault();
+
+                    /*
+                      For now drag still selects the tile;
+                      second interaction performs swap.
+                    */
+                    handleTileTap(tile);
+                }
+            );
+        }
+
+        function handleTileTap(tile) {
+
+            if (state.solved)
+                return;
+
+            if (
+                state.selectedTile ===
+                null
+            ) {
+
+                state.selectedTile = tile;
+
+                tile.element
+                    .classList.add("selected");
+
+                const eventsForTile = state.song.filter(e => e.tile === tile.correct);
+                if (eventsForTile.length) {
+                    eventsForTile.slice(0, 3).forEach((event, i) => {
+                        setTimeout(() => playNote(event.frequency, .1, .02), i * 60);
+                    });
+                } else {
+                    playNote(300, .1, .01);
+                }
+
+                return;
+            }
+
+            if (
+                state.selectedTile === tile
+            ) {
+
+                tile.element
+                    .classList.remove("selected");
+
+                state.selectedTile = null;
+
+                return;
+            }
+
+            const first =
+                state.selectedTile;
+
+            swapTiles(
+                first,
+                tile
+            );
+
+            first.element
+                .classList.remove("selected");
+
+            state.selectedTile = null;
+
+            updateSongProgress();
+
+            checkSolved();
+        }
+
+
+        /* =========================================================
+           SWAP
+        ========================================================= */
+
+        function swapTiles(a, b) {
+
+            const tempCorrect =
+                a.correct;
+
+            a.correct =
+                b.correct;
+
+            b.correct =
+                tempCorrect;
+
+            /*
+              Images move with their logical tile.
+            */
+            const tempSrc =
+                a.image.src;
+
+            a.image.src =
+                b.image.src;
+
+            b.image.src =
+                tempSrc;
+
+            /*
+              Small fragment sound.
+            */
+            const eventsForA =
+                state.song.filter(
+                    e => e.tile === a.correct
+                );
+
+            if (eventsForA.length) {
+                eventsForA.slice(0, 4).forEach((event, i) => {
+                    setTimeout(() => playNote(event.frequency, .11, .025), i * 70);
+                });
+            } else {
+                playNote(300, .1, .015);
+            }
+        }
+
+
+        /* =========================================================
+           MUSIC RECONSTRUCTION
+        ========================================================= */
+
+        function getCorrectCount() {
+
+            return state.tiles.filter(
+                (tile, index) =>
+                    tile.correct === index
+            ).length;
+        }
+
+        function updateSongProgress() {
+
+            if (!state.tiles.length)
+                return;
+
+            const correct =
+                getCorrectCount();
+
+            const percent =
+                correct /
+                state.tiles.length *
+                100;
+
+            $("songProgress").style.width =
+                percent + "%";
+
+            /*
+              Only play newly restored tiles.
+            */
+            const previous =
+                state.lastCorrectCount || 0;
+
+            if (correct > previous) {
+
+                const newlyCorrect =
+                    state.tiles.filter(
+                        (tile, index) =>
+                            tile.correct === index
+                    );
+
+                const tile =
+                    newlyCorrect[
+                    newlyCorrect.length - 1
+                    ];
+
+                if (tile) {
+
+                    const events =
+                        state.song.filter(
+                            e => e.tile === tile.correct
+                        );
+
+                    events
+                        .slice(0, 8)
+                        .forEach(
+                            (event, i) => {
+
+                                setTimeout(
+                                    () => {
+                                        playNote(
+                                            event.frequency,
+                                            event.duration,
+                                            event.velocity
+                                        );
+                                    },
+                                    i * 55
+                                );
+                            }
+                        );
+
+                    tile.element
+                        .classList.add("correct");
+
+                    setTimeout(
+                        () => {
+                            tile.element
+                                .classList.remove("correct");
+                        },
+                        350
+                    );
+                }
+            }
+
+            state.lastCorrectCount =
+                correct;
+        }
+
+
+        /* =========================================================
+           SOLVE
+        ========================================================= */
+
+        function checkSolved() {
+
+            if (
+                state.tiles.length === 0 ||
+                getCorrectCount() !== state.tiles.length
+            )
+                return;
+
+            if (state.solved)
+                return;
+
+            state.solved = true;
+
+            stopScheduledSong();
+
+            setTimeout(
+                completeLevel,
+                450
+            );
+        }
+
+
+        /* =========================================================
+           COMPLETE
+        ========================================================= */
+
+        async function completeLevel() {
+
+            $("successImage").src =
+                state.artworkCanvas
+                    ? state.artworkCanvas.toDataURL("image/png")
+                    : state.artworkURL;
+
+            $("stats").textContent =
+                `${state.song.length} NOTES · ` +
+                `${state.strokes.filter(s => !s.erase).length} STROKES · ` +
+                `LEVEL ${String(state.level).padStart(2, "0")}`;
+
+            showScreen("successScreen");
+
+            await sleep(350);
+
+            /*
+              Final full composition.
+            */
+            await playSong(state.song);
+        }
+
+
+        /* =========================================================
+           REMEMBER
+        ========================================================= */
+
+        $("remember").onclick = () => {
+
+            $("rememberModal")
+                .classList.add("show");
+        };
+
+        $("cancelRemember").onclick = () => {
+
+            $("rememberModal")
+                .classList.remove("show");
+        };
+
+        $("watchRemember").onclick =
+            async () => {
+
+                const button =
+                    $("watchRemember");
+
+                button.disabled = true;
+                button.textContent =
+                    "WATCHING...";
+
+                /*
+                  Replace this delay with the
+                  rewarded-ad SDK later.
+                */
+                await sleep(1200);
+
+                button.disabled = false;
+                button.textContent =
+                    "WATCH & REMEMBER";
+
+                $("rememberModal")
+                    .classList.remove("show");
+
+                showMemoryOverlay();
+            };
+
+        function showMemoryOverlay() {
+
+            /*
+              Remove old overlay if one exists.
+            */
+            document
+                .querySelectorAll(".memory-overlay")
+                .forEach(x => x.remove());
+
+            const overlay =
+                document.createElement("div");
+
+            overlay.className =
+                "memory-overlay";
+
+            overlay.innerHTML = `
+    <div style="
+      font-size:10px;
+      letter-spacing:3px;
+      color:#777c89;
+      margin-bottom:17px;
+    ">
+      REMEMBER
+    </div>
+
+    <img src="${state.artworkURL}" alt="">
+
+    <div class="small">
+      MEMORY FADES IN 3 SECONDS
+    </div>
+  `;
+
+            document.querySelector(".app").appendChild(
+                overlay
+            );
+
+            /*
+              Also play a tiny preview while
+              the memory is visible.
+            */
+            const preview =
+                state.song.slice(0, 18);
+
+            preview.forEach(
+                (event, index) => {
+
+                    const id = setTimeout(
+                        () => {
+                            playNote(
+                                event.frequency,
+                                event.duration,
+                                event.velocity
+                            );
+                        },
+                        index * 75
+                    );
+
+                    state.songTimerIds.push(id);
+                }
+            );
+
+            state.memoryTimer =
+                setTimeout(
+                    () => {
+                        overlay.remove();
+                    },
+                    3000
+                );
+        }
+
+
+        /* =========================================================
+           NEXT LEVEL
+        ========================================================= */
+
+        $("next").onclick = () => {
+
+            state.level++;
+
+            resetLevel();
+
+            showScreen("drawScreen");
+        };
+
+
+        /* =========================================================
+           TUTORIAL
+        ========================================================= */
+
+        const tutorial =
+            $("tutorial");
+
+        if (
+            localStorage.getItem(
+                "inkbreak_music_tutorial"
+            ) !== "1"
+        ) {
+            tutorial.classList.add("show");
+        }
+
+        $("startGame").onclick = () => {
+
+            localStorage.setItem(
+                "inkbreak_music_tutorial",
+                "1"
+            );
+
+            tutorial.classList.remove("show");
+
+            resetLevel();
+
+            showScreen("drawScreen");
+        };
+
+
+        /* =========================================================
+           RESIZE
+        ========================================================= */
+
+        let resizeTimer = null;
+
+        window.addEventListener(
+            "resize",
+            () => {
+
+                clearTimeout(resizeTimer);
+
+                resizeTimer =
+                    setTimeout(
+                        () => {
+
+                            if (
+                                $("drawScreen")
+                                    .classList
+                                    .contains("active")
+                            ) {
+                                resizeCanvas();
+                            }
+
+                        },
+                        150
+                    );
+            }
+        );
+
+
+        /* =========================================================
+           AUDIO UNLOCK ON FIRST TOUCH
+        ========================================================= */
+
+        document.addEventListener(
+            "touchstart",
+            () => {
+                getAudio();
+            },
+            {
+                once: true,
+                passive: true
+            }
+        );
+
+        document.addEventListener(
+            "pointerdown",
+            () => {
+                getAudio();
+            },
+            {
+                once: true
+            }
+        );
+
+
+        /* =========================================================
+           UTILITY
+        ========================================================= */
+
+        function sleep(ms) {
+
+            return new Promise(
+                resolve =>
+                    setTimeout(resolve, ms)
+            );
+        }
+
+
+        /* =========================================================
+           INITIALIZE
+        ========================================================= */
+
+        setTimeout(
+            () => {
+                resetLevel();
+            },
+            50
+        );
+
+    </script>
+
+</body>
+
+</html>
