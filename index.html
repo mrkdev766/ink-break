@@ -759,6 +759,8 @@
 
             <div class="solve">
                 EACH PIECE RESTORES PART OF YOUR MUSIC
+                <br><br>
+                <button id="restartLevelBtn" class="primary">RESTART LEVEL</button>
             </div>
 
         </section>
@@ -2962,6 +2964,11 @@
 
             $("rememberModal")
                 .classList.remove("show");
+        };
+
+        $("restartLevelBtn").onclick = () => {
+            showScreen("drawScreen");
+            resetLevel();
         };
 
         $("watchRemember").onclick =
